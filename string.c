@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include "shell.h"
 
 /**
  * _strdup - duplicates a given str
@@ -74,4 +74,50 @@ int _strcmp(const char *s1, const char *s2)
 
 	else
 		return (s1[i] - s2[i]);
+}
+
+/**
+ * split_str - breaks a string into an array of strings
+ * @str: the str to be splitted
+ * @delim: delimitter
+ *
+ * Return: array of splitted strings
+ */
+char **split_str(char *str, const char *delim)
+{
+	unsigned int size, i, j, len;
+	char *token, *save;
+	char **str_arr;
+	char **arr;
+
+	if (str == NULL)
+		return (NULL);
+
+	if (str_arr == NULL)
+		return (NULL);
+
+	for (size = 1, i = 0; ; str = NULL, ++i, ++size)
+	{
+		arr = _realloc_grid(str_arr, sizeof(char *) * size);
+		if (arr == NULL)
+		{
+			free_grid(str_arr);
+			return (NULL);
+		}
+
+		token = strtok_r(str, delim, &save);
+		len = _strlen(token) + 1;
+		free_grid(str_arr);
+		str_arr = arr;
+		str_arr[i] = malloc(sizeof(char) * len);
+		if (str_arr[i] == NULL)
+		{
+			free_grid(str_arr);
+			return (NULL);
+		}
+
+		str_arr[i] = token;
+		if (token == NULL)
+			return (str_arr);
+	}
 }

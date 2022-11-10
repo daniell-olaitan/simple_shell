@@ -16,13 +16,14 @@ int main(int ac, char **av, char **env)
 	char *builtins[] = {"exit", NULL};
 
 	(void)ac;
-	paths = get_paths(env);
+	(void)env;
+	paths = get_paths();
 	signal(SIGINT, SIG_IGN);
 	while (1)
 	{
 		prompt();
 		line = readline();
-		av = split(line, delim);
+		av = split_str(line, delim);
 		if (is_builtin(av[0], builtins))
 		{
 			execute_builtin(av);
@@ -34,7 +35,7 @@ int main(int ac, char **av, char **env)
 		}
 
 		free(line);
-		free(av);
+		free_grid(av);
 	}
 
 	return (EXIT_SUCCESS);

@@ -11,10 +11,11 @@
 #include <stddef.h>
 #include "_string.h"
 
-extern char **environ;
-
 void prompt(void);
-void execute(char **command);
-void shell_exit(char **command);
+char *_getenv(const char *name);
+char **get_paths(void);
+char **split_str(char *str, const char *delim);
+char **realloc_grid(char **ptr, size_t size);
+void free_grid(char **ptr);
 
 #endif /* _SHELL_H */
