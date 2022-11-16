@@ -1,42 +1,46 @@
 #include "shell.h"
 
 /**
- * main - A function that runs our shell.
- * @ac: The number of imputed arguments.
- * @av: the pointer to array of imputed arguments.
- * @env: the pointer to array of enviromental variables.
+ * main - entry point
+ * @ac: arg count
+ * @av: arg vector
  *
- * Return: Always 0.
+ * Return: 0 on success, 1 on error
  */
-int main(int ac, char **av, char **env)
+
+int main(int ac, char **av)
 {
-	char **paths;
-	char *line = NULL;
-	char *delim = "\t \n";
-	char *builtins[] = {"exit", NULL};
+	info_t info[] = { INFO_INIT };
+	int fd = 2;
 
-	(void)ac;
-	(void)env;
-	paths = get_paths();
-	signal(SIGINT, SIG_IGN);
-	while (1)
+	asm("mov %1, %0\n\t"
+		"add $3, %0"
+		: "=r" (fd)
+		: "r" (fd));
+
+	if (ac == 2)
 	{
-		prompt();
-		line = readline();
-		av = split_str(line, delim);
-		if (is_builtin(av[0], builtins))
+		fd = open(av[1], O_RDONLY);
+		if (fd == -1)
 		{
-			execute_builtin(av);
+			if (errno == EACCES)
+				exit(126);
+			if (errno == ENOENT)
+			{
+				_eputs(av[0]);
+				_eputs(": 0: Can't open ");
+				_eputs(av[1]);
+				_eputchar('\n');
+				_eputchar(BUF_FLUSH);
+				exit(127);
+			}
+			return (EXIT_FAILURE);
 		}
-		else
-		{
-			create_path(av, paths);
-			execute(av);
-		}
-
-		free(line);
-		free_grid(av);
+		info->readfd = fd;
 	}
-
+	populate_env_list(info);
+	read_history(info);
+	hsh(info, av);
 	return (EXIT_SUCCESS);
 }
+
